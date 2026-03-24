@@ -99,4 +99,4 @@ Para garantizar un desempeño óptimo en entornos de producción, ten en cuenta 
    - **APIs Externas (Poder de Razonamiento):** Modelos como OpenAI GPT-4o, Anthropic Claude 3.5 Sonnet o Gemini Pro 1.5 a través de servicios en la nube para analíticas que requieran un nivel cognitivo ultra alto.
 
 ---
-*Desarrollado para potenciar la respuesta automatizada frente a incidentes cibernéticos.*
+*Desarrollado con <3 por Alfredo Randolph para potenciar la respuesta automatizada frente a incidentes cibernéticos.*
