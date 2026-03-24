@@ -84,4 +84,19 @@ curl -X 'POST' 'http://localhost:8000/api/v1/webhook/analyze' \
 El Agente evaluará el evento, buscará el CVE, analizará la IP, mapeará la técnica a MITRE ATT&CK, y devolverá un diagnóstico estructurado.
 
 ---
+
+## 🏛️ Consideraciones Arquitectónicas y Casos de Uso
+
+Para garantizar un desempeño óptimo en entornos de producción, ten en cuenta las siguientes consideraciones de diseño:
+
+1. **Copiloto, no reemplazo:** Este agente no está pensado para reemplazar a un analista de ciberseguridad humano real. Su objetivo es **apoyarlo a tomar mejores decisiones** procesando la validación heurística inicial, reduciendo el ruido y preparando un resumen estructurado con contexto accionable.
+2. **Posicionamiento en la Red:** El agente **no** debe ubicarse en la primera línea de defensa (ej. ingesta cruda de Firewalls o recolectores masivos). Debido a los costos y tiempos de latencia inherentes a los LLMs, **será sobrepasado por la inmensa cantidad de eventos por segundo (EPS)**. Su lugar correcto es como un *Tier 2/3 Automático*: debe ubicarse *después* de que se hayan hecho los filtros previos (es decir, solo debe invocarse cuando el SIEM tradicional ya generó una "Alerta Notificada" por reglas de correlación).
+3. **Enriquecimiento de Contexto (CTI):** Se puede potenciar drásticamente el desempeño del agente integrando fuentes adicionales de Inteligencia de Amenazas (Threat Intelligence) como herramientas. Algunas fuentes que puedes integrar para brindarle mejor contexto incluyen:
+   - **Soluciones Gratuitas:** AlienVault OTX, AbuseIPDB, VirusTotal, MISP.
+   - **Soluciones Comerciales (Pago):** Mandiant Advantage, CrowdStrike Falcon Intelligence, Recorded Future.
+4. **Flexibilidad del Cerebro LLM:** Para lograr un mejor desempeño en tareas complejas de razonamiento o cumplir con políticas de privacidad estrictas (donde los logs no pueden salir a internet), el agente está diseñado para trabajar con diversos modelos:
+   - **LLMs Locales (Privacidad y Rapidez):** Puedes configurar herramientas como Ollama o vLLM para correr modelos en la red local (ej. Llama 3 8B, Mistral, Qwen 2.5).
+   - **APIs Externas (Poder de Razonamiento):** Modelos como OpenAI GPT-4o, Anthropic Claude 3.5 Sonnet o Gemini Pro 1.5 a través de servicios en la nube para analíticas que requieran un nivel cognitivo ultra alto.
+
+---
 *Desarrollado para potenciar la respuesta automatizada frente a incidentes cibernéticos.*
